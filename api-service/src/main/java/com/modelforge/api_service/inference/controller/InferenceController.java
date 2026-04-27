@@ -2,6 +2,8 @@ package com.modelforge.api_service.inference.controller;
 
 import com.modelforge.api_service.inference.dto.InferRequest;
 import com.modelforge.api_service.inference.dto.InferResponse;
+import com.modelforge.api_service.inference.dto.InferenceLogResponse;
+import com.modelforge.api_service.inference.entity.InferenceLog;
 import com.modelforge.api_service.inference.service.InferenceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import com.modelforge.api_service.inference.repository.InferenceLogRepository;
 
 import java.util.UUID;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/models")
@@ -41,7 +44,21 @@ public class InferenceController {
 
         org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
 
-        var logs = inferenceLogRepository.findByModelIdOrderByCalledAtDesc(modelId, pageable);
-        return ResponseEntity.ok(logs);
+        List<InferenceLog> logs = inferenceLogRepository.findLogsWithVersion(modelId, pageable);
+
+        List<InferenceLogResponse> response = logs.stream()
+                .map(log -> InferenceLogResponse.builder()
+                        .id(log.getId())
+                        .modelId(modelId)
+                        .versionId(log.getVersion().getId())
+                        .versionNumber(log.getVersion().getVersionNumber())
+                        .status(log.getStatus())
+                        .latencyMs(log.getLatencyMs())
+                        .errorMessage(log.getErrorMessage())
+                        .calledAt(log.getCalledAt())
+                        .build())
+                .collect(java.util.stream.Collectors.toList());
+
+        return ResponseEntity.ok(response);
     }
 }
