@@ -6,4 +6,14 @@ services:
       - 'POSTGRES_PASSWORD=secret'
       - 'POSTGRES_USER=myuser'
     ports:
-      - '5432'
+      - '5432:5432'
+
+  pgadmin:
+    image: "dpage/pgadmin4:latest"
+    environment:
+      - 'PGADMIN_DEFAULT_EMAIL=rohanbadmi@gmail.com'
+      - 'PGADMIN_DEFAULT_PASSWORD=modelforgeadmin@123'
+    ports:
+      - '8081:80'
+    depends_on:
+      - postgres
