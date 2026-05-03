@@ -2,6 +2,7 @@ package com.modelforge.api_service.model.service;
 
 import com.modelforge.api_service.auth.entity.User;
 import com.modelforge.api_service.auth.repository.UserRepository;
+import com.modelforge.api_service.exception.ModelNotFoundException;
 import com.modelforge.api_service.model.dto.ModelResponse;
 import com.modelforge.api_service.model.dto.ModelUploadRequest;
 import com.modelforge.api_service.model.dto.ModelUploadResponse;
@@ -41,7 +42,7 @@ public class ModelService {
                                            MultipartFile file) throws IOException {
         // Validate file
         if (file.isEmpty()) {
-            throw new RuntimeException("File is empty");
+            throw new ModelNotFoundException(file.getOriginalFilename());
         }
         String filename = file.getOriginalFilename();
         if (filename == null || !filename.endsWith(".pkl")) {

@@ -1,5 +1,6 @@
 package com.modelforge.api_service.inference.service;
 
+import com.modelforge.api_service.exception.ModelNotFoundException;
 import com.modelforge.api_service.inference.dto.InferRequest;
 import com.modelforge.api_service.inference.dto.InferResponse;
 import com.modelforge.api_service.inference.entity.InferenceLog;
@@ -35,11 +36,11 @@ public class InferenceService {
 
     public InferResponse infer(String email, UUID modelId, InferRequest request) {
         Model model = modelRepository.findById(modelId)
-                .orElseThrow(() -> new RuntimeException("Model not found"));
+                .orElseThrow(() -> new ModelNotFoundException(modelId.toString()));
 
         ModelVersion latest = modelVersionRepository
                 .findByModelIdAndIsLatestTrue(modelId)
-                .orElseThrow(() -> new RuntimeException("No version found for model"));
+                .orElseThrow(() -> new ModelNotFoundException(modelId.toString()));
 
         Map<String, Object> fastapiRequest = new HashMap<>();
         fastapiRequest.put("model_id", latest.getId().toString());

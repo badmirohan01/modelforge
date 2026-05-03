@@ -5,6 +5,8 @@ import com.modelforge.api_service.auth.dto.LoginRequest;
 import com.modelforge.api_service.auth.dto.RegisterRequest;
 import com.modelforge.api_service.auth.entity.User;
 import com.modelforge.api_service.auth.repository.UserRepository;
+import com.modelforge.api_service.exception.EmailAlreadyExistsException;
+import com.modelforge.api_service.exception.InvalidCredentialsException;
 import com.modelforge.api_service.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,10 +39,10 @@ public class AuthService {
 
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Invalid email or password"));
+                .orElseThrow(() -> new EmailAlreadyExistsException(request.getEmail()));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
-            throw new RuntimeException("Invalid email or password");
+            throw new InvalidCredentialsException();
         }
 
         if (!user.isActive()) {
