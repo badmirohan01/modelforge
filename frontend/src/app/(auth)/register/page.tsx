@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Box, Code, Globe, Loader2, Zap } from "lucide-react";
+import { Box, Code, Globe, Loader2, Zap, Eye, EyeOff } from "lucide-react";
 import api from "@/lib/api";
 import { toast } from "sonner";
 
@@ -14,6 +14,7 @@ export default function RegisterPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -34,10 +35,8 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-zinc-950 px-4 relative overflow-hidden">
-      {/* Background Glow Effects */}
-      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-white/5 blur-[120px] rounded-full animate-thunder" />
+      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-white/5 blur-[120px] rounded-full" />
       <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-white/10 blur-[100px] rounded-full animate-pulse" />
-      <div className="absolute inset-0 bg-white/5 opacity-0 animate-lightning pointer-events-none" />
       
       <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-10">
@@ -80,15 +79,28 @@ export default function RegisterPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="password" className="text-zinc-400 text-sm">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="bg-zinc-950/50 border-white/5 focus:border-white/20 transition-colors h-12"
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="bg-zinc-950/50 border-white/5 focus:border-white/20 transition-colors h-12 pr-12"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-zinc-500 hover:text-white transition-colors"
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
             </div>
 
             <Button 

@@ -14,7 +14,7 @@ export default function MarketingPage() {
       <section id="features" className="py-24 bg-zinc-900/30 relative overflow-hidden border-t border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-20">
-            <h2 className="text-4xl lg:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white to-zinc-500">
+            <h2 className="text-4xl lg:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white to-zinc-500 font-stylish">
               Built for Production
             </h2>
             <p className="text-zinc-400 text-lg max-w-2xl mx-auto">
@@ -61,7 +61,7 @@ export default function MarketingPage() {
       <section className="py-24 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center">
           <div className="max-w-3xl">
-            <h2 className="text-3xl lg:text-5xl font-bold mb-8">
+            <h2 className="text-3xl lg:text-5xl font-bold mb-8 font-stylish">
               Focus on your data, <br />
               <span className="text-primary italic">Not on your DevOps.</span>
             </h2>

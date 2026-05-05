@@ -20,6 +20,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Logo } from "@/components/logo";
+import { cn } from "@/lib/utils";
 
 const navItems = [
   { label: "Overview", icon: LayoutDashboard, href: "/dashboard" },
@@ -55,16 +57,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       >
         {/* Sidebar Header */}
         <div className="h-16 flex items-center px-4 shrink-0 overflow-hidden">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(59,130,246,0.3)]">
-              <Box className="w-5 h-5 text-white" />
-            </div>
-            {isSidebarOpen && (
-              <span className="font-bold tracking-tight whitespace-nowrap">
-                Model<span className="text-primary">Forge</span>
-              </span>
-            )}
-          </div>
+          <Link href="/" className="flex items-center gap-3">
+            <Logo className={cn("h-7 w-auto transition-all", !isSidebarOpen && "scale-110")} />
+          </Link>
         </div>
 
         <Separator className="bg-zinc-800" />
