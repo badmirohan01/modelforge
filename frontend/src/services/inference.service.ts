@@ -4,12 +4,17 @@ import { InferResponse, InferenceLogResponse } from '@/types';
 export const inferenceService = {
   async infer(
     modelId: string,
-    inputs: unknown,
+    payload: any,
     proba: boolean = false
   ): Promise<InferResponse> {
+    // If user typed a raw array, wrap it. If it's already an object, use it.
+    const requestBody = Array.isArray(payload) 
+      ? { inputs: payload, returnProba: proba }
+      : { ...payload, returnProba: proba };
+
     const { data } = await api.post<InferResponse>(
       `/api/models/${modelId}/infer`,
-      { inputs, proba }
+      requestBody
     );
     return data;
   },

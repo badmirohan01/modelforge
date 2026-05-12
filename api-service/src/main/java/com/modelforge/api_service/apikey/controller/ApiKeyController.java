@@ -38,6 +38,8 @@ public class ApiKeyController {
         return ResponseEntity.ok(apiKeyService.getKeysForModel(modelId));
     }
 
+    @PutMapping
+
     @DeleteMapping("/{modelId}/keys/{keyId}")
     public ResponseEntity<Void> revokeKey(
             @PathVariable UUID modelId,

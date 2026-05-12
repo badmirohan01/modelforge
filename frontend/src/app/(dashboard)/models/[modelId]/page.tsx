@@ -118,8 +118,9 @@ export default function ModelDetailPage({ params }: ModelDetailPageProps) {
             <ApiKeyCard
               keys={keys}
               isLoading={isKeysLoading}
-              onGenerate={(label) => generateKey.mutate(label)}
+              onGenerate={(label) => generateKey.mutateAsync(label)}
               onRevoke={(id) => revokeKey.mutate(id)}
+              onUpdate={(id, label) => updateKey.mutate({ keyId: id, label })}
               isGenerating={generateKey.isPending}
             />
           </div>

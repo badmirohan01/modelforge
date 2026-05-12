@@ -61,9 +61,13 @@ export function useModelDetail(modelId: string) {
       proba?: boolean;
     }) => inferenceService.infer(modelId, inputs, proba),
     onSuccess: () => {
-      // Refresh first page of logs after new inference
+      // Refresh model stats (Total Calls, Avg Latency)
       queryClient.invalidateQueries({
-        queryKey: ['logs', modelId, 0],
+        queryKey: ['model', modelId],
+      });
+      // Refresh logs
+      queryClient.invalidateQueries({
+        queryKey: ['logs', modelId],
       });
       toast.success('Inference completed!');
     },
@@ -102,6 +106,20 @@ export function useModelDetail(modelId: string) {
     },
   });
 
+  const updateKeyMutation = useMutation({
+    mutationFn: ({ keyId, label }: { keyId: string; label: string }) =>
+      apikeyService.updateKey(modelId, keyId, label),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['keys', modelId] });
+      toast.success('API key renamed.');
+    },
+    onError: (error: AxiosError<ErrorResponse>) => {
+      const message =
+        error.response?.data?.message || 'Failed to rename key.';
+      toast.error(message);
+    },
+  });
+
   // --- Combined loading state ---
   const isLoading =
     modelQuery.isLoading || keysQuery.isLoading || logsQuery.isLoading;
@@ -128,6 +146,7 @@ export function useModelDetail(modelId: string) {
     infer: inferMutation,
     generateKey: generateKeyMutation,
     revokeKey: revokeKeyMutation,
+    updateKey: updateKeyMutation,
 
     // Combined
     isLoading,

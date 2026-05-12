@@ -24,4 +24,17 @@ export const apikeyService = {
   async revokeKey(modelId: string, keyId: string): Promise<void> {
     await api.delete(`/api/models/${modelId}/keys/${keyId}`);
   },
+
+  async updateKey(
+    modelId: string,
+    keyId: string,
+    label: string
+  ): Promise<ApiKeyResponse> {
+    const { data } = await api.put<ApiKeyResponse>(
+      `/api/models/${modelId}/keys/${keyId}`,
+      null,
+      { params: { label } }
+    );
+    return data;
+  },
 };
