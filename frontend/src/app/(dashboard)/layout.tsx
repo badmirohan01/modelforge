@@ -25,16 +25,21 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { label: "Overview", icon: LayoutDashboard, href: "/dashboard" },
-  { label: "My Models", icon: Cpu, href: "/dashboard/models" },
-  { label: "API Keys", icon: Key, href: "/dashboard/settings" },
-  { label: "Inference Logs", icon: History, href: "/dashboard/logs" },
+  { label: "My Models", icon: Cpu, href: "/models" },
+  { label: "API Keys", icon: Key, href: "/settings" },
+  { label: "Inference Logs", icon: History, href: "/logs" },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
-  const { user, logout, isAuthenticated } = useAuthStore();
+  const { email, logout, isAuthenticated } = useAuthStore();
   const router = useRouter();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Redirect if not authenticated (client-side fallback for middleware)
   useEffect(() => {
@@ -90,7 +95,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div className="p-3 mt-auto">
           <div className={`p-3 rounded-xl bg-zinc-800/50 border border-zinc-700/50 mb-4 overflow-hidden ${!isSidebarOpen && "hidden"}`}>
             <p className="text-[10px] uppercase tracking-wider text-zinc-500 font-bold mb-1">User Profile</p>
-            <p className="text-sm font-medium truncate">{user?.email || "User"}</p>
+            <p className="text-sm font-medium truncate">{mounted ? (email || "User") : "User"}</p>
           </div>
           <Button 
             variant="ghost" 
@@ -133,7 +138,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <Separator orientation="vertical" className="h-6 bg-zinc-800" />
             <div className="flex items-center gap-3 pl-2">
               <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-zinc-700 to-zinc-400 flex items-center justify-center font-bold text-xs uppercase shadow-[0_0_10px_rgba(255,255,255,0.1)]">
-                {user?.email?.charAt(0) || "U"}
+                {mounted ? (email?.charAt(0) || "U") : "U"}
               </div>
             </div>
           </div>

@@ -5,6 +5,7 @@ import com.modelforge.api_service.model.dto.ModelUploadRequest;
 import com.modelforge.api_service.model.dto.ModelUploadResponse;
 import com.modelforge.api_service.model.service.ModelService;
 import jakarta.validation.Valid;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -45,5 +46,12 @@ public class ModelController {
     @GetMapping
     public ResponseEntity<List<ModelResponse>> getMyModels(Authentication authentication) {
         return ResponseEntity.ok(modelService.getMyModels(authentication.getName()));
+    }
+
+    @GetMapping("/{modelId}")
+    public ResponseEntity<ModelResponse> getModel(
+            @PathVariable UUID modelId,
+            Authentication authentication) {
+        return ResponseEntity.ok(modelService.getModel(modelId, authentication.getName()));
     }
 }

@@ -1,42 +1,27 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Box, Code, Globe, Loader2, Zap, Eye, EyeOff } from "lucide-react";
-import { useAuthStore } from "@/store/authStore";
-import api from "@/lib/api";
-import { toast } from "sonner";
+import { Box, Loader2, Zap, Eye, EyeOff } from "lucide-react";
+import { useLogin } from "@/hooks/useAuth";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
-  const login = useAuthStore((state) => state.login);
+  const { mutate, isPending, error } = useLogin();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-
-    try {
-      const response = await api.post("/auth/login", { email, password });
-      console.log("Login Response:", response.data);
-      const { token, email: userEmail } = response.data;
-      
-      login(token, userEmail);
-      toast.success("Welcome back, developer.");
-      router.push("/dashboard");
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Authentication failed. Check your credentials.");
-    } finally {
-      setLoading(false);
-    }
+    mutate({ email, password });
   };
+
+  const errorMessage =
+    error?.response?.data?.message ||
+    (error ? "Login failed. Please try again." : null);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-zinc-950 px-4 relative overflow-hidden">
@@ -100,12 +85,16 @@ export default function LoginPage() {
               </div>
             </div>
 
+            {errorMessage && (
+              <p className="text-sm text-red-400 text-center">{errorMessage}</p>
+            )}
+
             <Button 
               type="submit" 
               className="w-full h-12 bg-white hover:bg-zinc-200 text-black font-bold transition-all shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-[0_0_40px_rgba(255,255,255,0.2)]"
-              disabled={loading}
+              disabled={isPending}
             >
-              {loading ? (
+              {isPending ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
                 <span className="flex items-center gap-2">
@@ -114,24 +103,6 @@ export default function LoginPage() {
               )}
             </Button>
           </form>
-
-          <div className="relative my-8">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-white/5" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-zinc-900 px-2 text-zinc-500 font-mono tracking-widest">Or continue with</span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <Button variant="outline" className="border-white/10 bg-zinc-950/50 hover:bg-white/5 text-zinc-300 transition-all">
-              <Code className="w-4 h-4 mr-2" /> GitHub
-            </Button>
-            <Button variant="outline" className="border-white/10 bg-zinc-950/50 hover:bg-white/5 text-zinc-300 transition-all">
-              <Globe className="w-4 h-4 mr-2" /> Google
-            </Button>
-          </div>
         </div>
 
         <p className="text-center text-zinc-500 text-sm mt-8">

@@ -17,4 +17,6 @@ public class ModelResponse {
     private Integer latestVersion;
     private UUID latestVersionId;
     private String inferEndpoint;
+    private Long totalCalls;
+    private Double avgLatencyMs;
 }

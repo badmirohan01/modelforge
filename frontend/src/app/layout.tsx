@@ -1,6 +1,7 @@
 import { Inter, JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
+import Providers from "@/components/Providers";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const stylish = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-stylish" });
@@ -19,10 +20,12 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${stylish.variable} ${mono.variable} dark antialiased`}>
       <body className="min-h-screen bg-zinc-950 font-sans text-zinc-50 selection:bg-white/10 selection:text-white">
-        <main className="flex-1">
-          {children}
-        </main>
-        <Toaster position="top-right" theme="dark" richColors closeButton />
+        <Providers>
+          <main className="flex-1">
+            {children}
+          </main>
+          <Toaster position="top-right" theme="dark" richColors closeButton />
+        </Providers>
       </body>
     </html>
   );
