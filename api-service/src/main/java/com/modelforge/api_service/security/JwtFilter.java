@@ -31,8 +31,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
+            HttpServletResponse response,
+            FilterChain filterChain)
             throws ServletException, IOException {
 
         // Try JWT first
@@ -41,10 +41,9 @@ public class JwtFilter extends OncePerRequestFilter {
             String token = authHeader.substring(7);
             if (jwtUtil.isValid(token)) {
                 String email = jwtUtil.extractEmail(token);
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                email, null,
-                                List.of(new SimpleGrantedAuthority("ROLE_USER")));
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        email, null,
+                        List.of(new SimpleGrantedAuthority("ROLE_USER")));
                 authentication.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -62,18 +61,27 @@ public class JwtFilter extends OncePerRequestFilter {
             if (foundKey.isPresent()) {
                 ApiKey key = foundKey.get();
 
-                // Update last used async — do it in a separate thread to avoid slowing the request
+                String path = request.getRequestURI();
+                String requestedModelId = extractModelIdFromPath(path);
+
+                boolean authorized = key.isGlobal() ||
+                        key.getModels().stream()
+                                .anyMatch(m -> m.getId().toString().equals(requestedModelId));
+
+                // Update last used async — do it in a separate thread to avoid slowing the
+                // request
                 new Thread(() -> apiKeyRepository.updateLastUsedAt(
                         key.getId(), LocalDateTime.now())).start();
 
-                String principal = "apikey:" + key.getModel().getId().toString();
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                principal, null,
-                                List.of(new SimpleGrantedAuthority("ROLE_API")));
-                authentication.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                if (authorized) {
+                    String principal = "apikey:" + key.getModel().getId().toString();
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                            principal, null,
+                            List.of(new SimpleGrantedAuthority("ROLE_API")));
+                    authentication.setDetails(
+                            new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
             }
         }
 
@@ -88,5 +96,15 @@ public class JwtFilter extends OncePerRequestFilter {
         } catch (Exception e) {
             throw new RuntimeException("Failed to hash key");
         }
+    }
+
+    private String extractModelIdFromPath(String path) {
+        String[] parts = path.split("/");
+        for (int i = 0; i < parts.length; i++) {
+            if (parts[i].equals("models") && i + 1 < parts.length) {
+                return parts[i + 1];
+            }
+        }
+        return "";
     }
 }

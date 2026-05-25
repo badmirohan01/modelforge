@@ -5,17 +5,17 @@ import { ModelResponse } from "@/types";
 interface StatsCardsProps {
   models?: ModelResponse[];
   isLoading: boolean;
+  activeKeyCount?: number;
 }
 
-export function StatsCards({ models = [], isLoading }: StatsCardsProps) {
+export function StatsCards({ models = [], isLoading, activeKeyCount = 0 }: StatsCardsProps) {
   const totalModels = models.length;
   const totalInferences = models.reduce((sum, m) => sum + (m.totalCalls || 0), 0);
   const avgLatency = models.length
     ? (models.reduce((sum, m) => sum + (m.avgLatencyMs || 0), 0) / models.length).toFixed(0)
     : 0;
 
-  // Active API Keys could be fetched separately or calculated if we had all keys
-  const activeKeys = 0; // Placeholder until implemented
+  const activeKeys = activeKeyCount;
 
   const stats = [
     { label: "Total Models", value: totalModels, icon: Layers, color: "text-zinc-300" },

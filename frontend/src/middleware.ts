@@ -5,9 +5,12 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get('token')?.value;
 
-  // Protected routes: /dashboard or /models without token → redirect to /login
+  // Protected routes: /dashboard, /models, /api-keys, /logs without token → redirect to /login
   const isProtectedRoute =
-    pathname.startsWith('/dashboard') || pathname.startsWith('/models');
+    pathname.startsWith('/dashboard') ||
+    pathname.startsWith('/models') ||
+    pathname.startsWith('/api-keys') ||
+    pathname.startsWith('/logs');
 
   // Auth routes: /login or /register with token → redirect to /dashboard
   const isAuthRoute = pathname === '/login' || pathname === '/register';
@@ -24,5 +27,6 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/models/:path*', '/login', '/register'],
+  matcher: ['/dashboard/:path*', '/models/:path*', '/api-keys/:path*', '/logs/:path*', '/login', '/register'],
 };
+

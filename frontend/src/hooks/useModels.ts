@@ -3,11 +3,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { modelService } from '@/services/model.service';
+import { ErrorResponse } from '@/types';
 import { AxiosError } from 'axios';
-
-interface ErrorResponse {
-  message: string;
-}
 
 /**
  * Fetches the full list of models.

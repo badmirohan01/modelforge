@@ -1,0 +1,102 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuthStore } from "@/store/authStore";
+import {
+  LayoutDashboard,
+  Cpu,
+  Key,
+  History,
+  LogOut,
+  ChevronRight,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Logo } from "@/components/logo";
+import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
+
+const navItems = [
+  { label: "Overview", icon: LayoutDashboard, href: "/dashboard" },
+  { label: "My Models", icon: Cpu, href: "/models" },
+  { label: "API Keys", icon: Key, href: "/api-keys" },
+  { label: "Inference Logs", icon: History, href: "/logs" },
+];
+
+interface SidebarProps {
+  isOpen: boolean;
+}
+
+export function Sidebar({ isOpen }: SidebarProps) {
+  const [mounted, setMounted] = useState(false);
+  const pathname = usePathname();
+  const { email, logout } = useAuthStore();
+  const router = useRouter();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const handleLogout = () => {
+    logout();
+    router.push("/login");
+  };
+
+  return (
+    <aside
+      className={`${
+        isOpen ? "w-64" : "w-20"
+      } border-r border-zinc-800 bg-zinc-900/50 backdrop-blur-xl transition-all duration-300 flex flex-col z-50 
+        max-md:fixed max-md:inset-y-0 max-md:left-0 ${!isOpen ? "max-md:-translate-x-full" : "max-md:translate-x-0"}
+      `}
+    >
+      {/* Sidebar Header */}
+      <div className="h-16 flex items-center px-4 shrink-0 overflow-hidden">
+        <Link href="/" className="flex items-center gap-3">
+          <Logo className={cn("h-7 w-auto transition-all", !isOpen && "scale-110")} />
+        </Link>
+      </div>
+
+      <Separator className="bg-zinc-800" />
+
+      {/* Sidebar Nav */}
+      <nav className="flex-1 py-4 px-3 space-y-1">
+        {navItems.map((item) => {
+          const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group ${
+                isActive
+                  ? "bg-primary/10 text-primary"
+                  : "text-zinc-400 hover:text-zinc-50 hover:bg-zinc-800"
+              }`}
+            >
+              <item.icon className={`w-5 h-5 shrink-0 ${isActive ? "text-primary" : "group-hover:text-zinc-50"}`} />
+              {isOpen && <span className="text-sm font-medium">{item.label}</span>}
+              {isActive && isOpen && <ChevronRight className="ml-auto w-4 h-4" />}
+            </Link>
+          );
+        })}
+      </nav>
+
+      {/* Sidebar Footer */}
+      <div className="p-3 mt-auto">
+        <div className={`p-3 rounded-xl bg-zinc-800/50 border border-zinc-700/50 mb-4 overflow-hidden ${!isOpen && "hidden"}`}>
+          <p className="text-[10px] uppercase tracking-wider text-zinc-500 font-bold mb-1">User Profile</p>
+          <p className="text-sm font-medium truncate">{mounted ? (email || "User") : "User"}</p>
+        </div>
+        <Button
+          variant="ghost"
+          className="w-full justify-start text-zinc-400 hover:text-red-400 hover:bg-red-400/10"
+          onClick={handleLogout}
+        >
+          <LogOut className="w-5 h-5 mr-3 shrink-0" />
+          {isOpen && <span>Sign Out</span>}
+        </Button>
+      </div>
+    </aside>
+  );
+}

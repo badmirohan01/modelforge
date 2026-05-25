@@ -18,8 +18,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${stylish.variable} ${mono.variable} dark antialiased`}>
-      <body className="min-h-screen bg-zinc-950 font-sans text-zinc-50 selection:bg-white/10 selection:text-white">
+    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${stylish.variable} ${mono.variable} dark antialiased`}>
+      <body suppressHydrationWarning className="min-h-screen bg-zinc-950 font-sans text-zinc-50 selection:bg-white/10 selection:text-white">
         <Providers>
           <main className="flex-1">
             {children}

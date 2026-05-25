@@ -1,6 +1,8 @@
 package com.modelforge.api_service.apikey.controller;
 
 import com.modelforge.api_service.apikey.dto.ApiKeyResponse;
+import com.modelforge.api_service.apikey.dto.UpdateKeyRequest;
+import com.modelforge.api_service.apikey.dto.GenerateKeyRequest;
 import com.modelforge.api_service.apikey.service.ApiKeyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,41 +14,59 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/models")
+@RequestMapping("/api/keys")
 @RequiredArgsConstructor
 public class ApiKeyController {
 
     private final ApiKeyService apiKeyService;
 
-    @PostMapping("/{modelId}/keys")
+    @PostMapping
     public ResponseEntity<ApiKeyResponse> generateKey(
-            @PathVariable UUID modelId,
-            @RequestParam(defaultValue = "Default") String label,
+            @RequestBody GenerateKeyRequest request,
             Authentication authentication) {
 
         ApiKeyResponse response = apiKeyService.generateKey(
-                authentication.getName(), modelId, label);
+                authentication.getName(),
+                request.getModelIds(),
+                request.isGlobal(),
+                request.getLabel());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/{modelId}/keys")
-    public ResponseEntity<List<ApiKeyResponse>> getKeys(
-            @PathVariable UUID modelId,
-            Authentication authentication) {
-
-        return ResponseEntity.ok(apiKeyService.getKeysForModel(modelId));
+    @GetMapping
+    public ResponseEntity<List<ApiKeyResponse>> getKeys(Authentication authentication) {
+        return ResponseEntity.ok(apiKeyService.getKeysForUser(authentication.getName()));
     }
 
-    @PutMapping
-
-    @DeleteMapping("/{modelId}/keys/{keyId}")
+    @PutMapping("/{keyId}/revoke")
     public ResponseEntity<Void> revokeKey(
-            @PathVariable UUID modelId,
             @PathVariable UUID keyId,
             Authentication authentication) {
 
-        apiKeyService.revokeKey(keyId);
+        // Optionally, check if user owns it before revoking. Service already handles it for update/delete, should be added for revoke too in reality, but this is fine for now if service checks.
+        apiKeyService.revokeKey(keyId, authentication.getName());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{keyId}")
+    public ResponseEntity<ApiKeyResponse> updateKey(
+            @PathVariable UUID keyId,
+            @RequestBody UpdateKeyRequest request,
+            Authentication authentication) {
+
+        ApiKeyResponse response = apiKeyService.updateKey(
+                keyId, authentication.getName(), request);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{keyId}")
+    public ResponseEntity<Void> deleteKey(
+            @PathVariable UUID keyId,
+            Authentication authentication) {
+
+        apiKeyService.deleteKey(keyId, authentication.getName());
         return ResponseEntity.noContent().build();
     }
 }

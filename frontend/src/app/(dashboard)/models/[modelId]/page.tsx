@@ -1,11 +1,12 @@
 "use client";
 
-import { use } from "react";
+import { use, useState } from "react";
 import { useModelDetail } from "@/hooks/useModelDetail";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Box, LayoutGrid, Terminal } from "lucide-react";
+import { ArrowLeft, Box, LayoutGrid, Terminal, Copy, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { format } from "date-fns";
 import { InferenceConsole } from "@/components/dashboard/inference-console";
@@ -20,6 +21,8 @@ export default function ModelDetailPage({ params }: ModelDetailPageProps) {
   // Extract modelId from promise using React 19's `use` hook
   const { modelId } = use(params);
 
+  const [copied, setCopied] = useState(false);
+
   const {
     model,
     isModelLoading,
@@ -32,7 +35,16 @@ export default function ModelDetailPage({ params }: ModelDetailPageProps) {
     infer,
     generateKey,
     revokeKey,
+    updateKey,
   } = useModelDetail(modelId);
+
+  const handleCopyEndpoint = () => {
+    if (model?.inferEndpoint) {
+      navigator.clipboard.writeText(model.inferEndpoint);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   if (isModelLoading || !model) {
     return (
@@ -84,6 +96,30 @@ export default function ModelDetailPage({ params }: ModelDetailPageProps) {
         <div className="flex flex-col items-end text-sm text-zinc-500">
           <span>Created on {format(new Date(model.createdAt), "MMM d, yyyy")}</span>
           <span className="font-mono text-xs mt-1">ID: mf_...{model.id.substring(0, 8)}</span>
+        </div>
+      </div>
+
+      {/* Endpoint Section — monospace URL with copy button */}
+      <div className="p-4 bg-zinc-900/50 border border-zinc-800 rounded-xl">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex-1 min-w-0">
+            <p className="text-xs text-zinc-500 uppercase tracking-wider font-bold mb-1.5">Inference Endpoint</p>
+            <code className="text-sm font-mono text-zinc-300 block truncate">
+              {model.inferEndpoint}
+            </code>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-zinc-700 bg-zinc-800/50 hover:bg-zinc-700 shrink-0"
+            onClick={handleCopyEndpoint}
+          >
+            {copied ? (
+              <><Check className="w-4 h-4 mr-1.5 text-green-500" /> Copied</>
+            ) : (
+              <><Copy className="w-4 h-4 mr-1.5" /> Copy URL</>
+            )}
+          </Button>
         </div>
       </div>
 

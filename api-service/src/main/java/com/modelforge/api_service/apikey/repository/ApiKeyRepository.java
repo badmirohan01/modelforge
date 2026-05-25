@@ -13,6 +13,8 @@ public interface ApiKeyRepository extends JpaRepository<ApiKey, UUID> {
 
     Optional<ApiKey> findByKeyHashAndIsActiveTrue(String keyHash);
 
+    List<ApiKey> findByOwnerEmailOrderByCreatedAtDesc(String email);
+
     List<ApiKey> findByModelIdOrderByCreatedAtDesc(UUID modelId);
 
     @Modifying

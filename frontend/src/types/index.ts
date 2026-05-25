@@ -47,10 +47,15 @@ export interface InferenceLogResponse {
 
 export interface ApiKeyResponse {
   id: string;
-  modelId: string;
   label: string;
   rawKey: string | null;
   isActive: boolean;
+  isGlobal: boolean;
+  modelIds: string[];
   lastUsedAt: string | null;
   createdAt: string;
+}
+
+export interface ErrorResponse {
+  message: string;
 }

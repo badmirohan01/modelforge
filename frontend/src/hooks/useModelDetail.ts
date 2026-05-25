@@ -10,11 +10,8 @@ import { toast } from 'sonner';
 import { modelService } from '@/services/model.service';
 import { inferenceService } from '@/services/inference.service';
 import { apikeyService } from '@/services/apikey.service';
+import { ErrorResponse } from '@/types';
 import { AxiosError } from 'axios';
-
-interface ErrorResponse {
-  message: string;
-}
 
 /**
  * Composite hook for the model detail page.

@@ -5,11 +5,8 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { authService } from '@/services/auth.service';
 import { useAuthStore } from '@/store/authStore';
+import { ErrorResponse } from '@/types';
 import { AxiosError } from 'axios';
-
-interface ErrorResponse {
-  message: string;
-}
 
 export function useLogin() {
   const router = useRouter();
