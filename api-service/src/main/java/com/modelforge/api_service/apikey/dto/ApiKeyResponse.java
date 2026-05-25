@@ -11,10 +11,11 @@ import java.util.List;
 @Builder
 public class ApiKeyResponse {
     private UUID id;
-    private UUID modelId;
     private String label;
     private String rawKey;
     private List<UUID> modelIds;
+
+    @JsonProperty("isGlobal")
     private boolean isGlobal;
 
     @JsonProperty("isActive")

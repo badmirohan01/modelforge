@@ -37,7 +37,11 @@ export function useModelDetail(modelId: string) {
 
   const keysQuery = useQuery({
     queryKey: ['keys', modelId],
-    queryFn: () => apikeyService.getKeys(modelId),
+    queryFn: async () => {
+      // The new getKeys fetches all keys for the user. We filter them here for this specific model.
+      const allKeys = await apikeyService.getKeys();
+      return allKeys.filter(k => k.isGlobal || (k.modelIds && k.modelIds.includes(modelId)));
+    },
     enabled: !!modelId,
   });
 
@@ -77,7 +81,7 @@ export function useModelDetail(modelId: string) {
 
   const generateKeyMutation = useMutation({
     mutationFn: (label: string) =>
-      apikeyService.generateKey(modelId, label),
+      apikeyService.generateKey([modelId], false, label),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['keys', modelId] });
       toast.success('API key generated!');
@@ -91,7 +95,7 @@ export function useModelDetail(modelId: string) {
 
   const revokeKeyMutation = useMutation({
     mutationFn: (keyId: string) =>
-      apikeyService.revokeKey(modelId, keyId),
+      apikeyService.revokeKey(keyId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['keys', modelId] });
       toast.success('API key revoked.');
@@ -105,7 +109,7 @@ export function useModelDetail(modelId: string) {
 
   const updateKeyMutation = useMutation({
     mutationFn: ({ keyId, label }: { keyId: string; label: string }) =>
-      apikeyService.updateKey(modelId, keyId, label),
+      apikeyService.updateKey(keyId, label),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['keys', modelId] });
       toast.success('API key renamed.');

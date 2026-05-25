@@ -127,127 +127,102 @@ export function ApiKeyCard({ keys, models, isLoading, onGenerate, onRevoke, onDe
               </div>
             ) : (
               keys.map((key) => (
-                <div key={key.id} className="flex flex-col md:flex-row md:items-center justify-between p-5 rounded-xl border border-zinc-800 bg-zinc-950/30 hover:bg-zinc-900/50 transition-all duration-200 group gap-4">
+                <div key={key.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 px-4 rounded-xl border border-zinc-800/60 bg-zinc-950/40 hover:bg-zinc-900/60 transition-all duration-200 group gap-4">
                   
-                  {/* Left Column: Label & Key Prefix */}
-                  <div className="flex-1 min-w-[200px]">
-                    <div className="flex items-center gap-2.5 mb-2">
-                      {editingId === key.id ? (
-                        <div className="flex items-center gap-1.5 w-full max-w-xs">
-                          <Input
-                            autoFocus
-                            value={editLabel}
-                            onChange={(e) => setEditLabel(e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && saveEdit(key.id)}
-                            className="h-8 text-sm bg-zinc-900 border-zinc-700 text-white focus:ring-1 focus:ring-primary/50"
-                          />
-                          <button onClick={() => saveEdit(key.id)} className="p-1.5 hover:text-emerald-400 transition-colors bg-zinc-800 rounded-md">
-                            <Check className="w-4 h-4" />
-                          </button>
-                          <button onClick={cancelEditing} className="p-1.5 hover:text-red-400 transition-colors bg-zinc-800 rounded-md">
-                            <X className="w-4 h-4" />
-                          </button>
-                        </div>
-                      ) : (
-                        <>
-                          <span className="font-bold text-base text-zinc-100">{key.label}</span>
-                          <button 
-                            onClick={() => startEditing(key)} 
-                            className="p-1 text-zinc-600 hover:text-zinc-300 transition-colors opacity-0 group-hover:opacity-100"
-                            title="Rename Key"
-                          >
-                            <Pencil className="w-3.5 h-3.5" />
-                          </button>
-                        </>
-                      )}
+                  {/* Left: Meta */}
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="flex items-center justify-center w-9 h-9 rounded-full bg-zinc-900 border border-zinc-800 shrink-0">
+                      <KeyIcon className="w-4 h-4 text-zinc-500" />
                     </div>
-                    <div className="flex items-center gap-2 text-sm font-mono text-zinc-500 bg-zinc-900/50 w-fit px-2.5 py-1 rounded-md border border-zinc-800/50">
-                      <KeyIcon className="w-3.5 h-3.5 text-zinc-600" />
-                      <span>mf_...{key.id.substring(0, 12)}</span>
+                    <div className="flex flex-col flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        {editingId === key.id ? (
+                          <div className="flex items-center gap-1.5 w-full max-w-[200px]">
+                            <Input
+                              autoFocus
+                              value={editLabel}
+                              onChange={(e) => setEditLabel(e.target.value)}
+                              onKeyDown={(e) => e.key === 'Enter' && saveEdit(key.id)}
+                              className="h-6 px-2 text-xs bg-zinc-950 border-zinc-700 text-white focus-visible:ring-1 focus-visible:ring-emerald-500/50"
+                            />
+                            <button onClick={() => saveEdit(key.id)} className="text-emerald-500 hover:text-emerald-400"><Check className="w-3.5 h-3.5" /></button>
+                            <button onClick={cancelEditing} className="text-zinc-500 hover:text-zinc-400"><X className="w-3.5 h-3.5" /></button>
+                          </div>
+                        ) : (
+                          <>
+                            <span className="font-medium text-sm text-zinc-100 truncate">{key.label}</span>
+                            <button onClick={() => startEditing(key)} className="text-zinc-600 hover:text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Pencil className="w-3 h-3" />
+                            </button>
+                          </>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 text-[11px] text-zinc-500 mt-0.5">
+                        <code className="font-mono text-zinc-400/80">mf_...{key.id.substring(0, 8)}</code>
+                        <span className="text-zinc-700">•</span>
+                        <span>{format(new Date(key.createdAt), "MMM d, yyyy")}</span>
+                      </div>
                     </div>
                   </div>
                   
-                  {/* Middle Column: Access Rights */}
-                  <div className="flex-1 min-w-[150px]">
-                    <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-semibold mb-1.5">Access</p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {key.isGlobal ? (
-                        <Badge variant="secondary" className="bg-blue-500/10 text-blue-400 border-blue-500/20 text-xs font-normal">
-                          <Globe className="w-3 h-3 mr-1" /> All Models
-                        </Badge>
-                      ) : key.modelIds && key.modelIds.length > 0 ? (
-                        getModelNames(key.modelIds).map((name, i) => (
-                          <Badge key={i} variant="outline" className="text-zinc-300 border-zinc-700 bg-zinc-900 text-xs font-normal">
-                            <Database className="w-3 h-3 mr-1 text-zinc-500" /> {name}
-                          </Badge>
-                        ))
-                      ) : (
-                        <span className="text-sm text-zinc-500">None</span>
-                      )}
-                    </div>
+                  {/* Middle: Badges */}
+                  <div className="flex items-center gap-2 shrink-0">
+                    {key.isGlobal ? (
+                      <Badge variant="secondary" className="bg-blue-500/10 text-blue-400 border-blue-500/20 text-[10px] font-medium h-5 px-1.5 rounded-md">
+                        <Globe className="w-3 h-3 mr-1" /> All Models
+                      </Badge>
+                    ) : key.modelIds && key.modelIds.length > 0 ? (
+                      <Badge variant="outline" className="text-zinc-400 border-zinc-800 bg-zinc-900 text-[10px] font-medium h-5 px-1.5 rounded-md">
+                        <Database className="w-3 h-3 mr-1 text-zinc-500" /> {key.modelIds.length} Model{key.modelIds.length > 1 ? 's' : ''}
+                      </Badge>
+                    ) : (
+                      <span className="text-xs text-zinc-600">No Models</span>
+                    )}
+
+                    <Badge 
+                      variant="outline" 
+                      className={`text-[10px] h-5 px-1.5 border-none font-medium rounded-md ${
+                        key.isActive ? "bg-emerald-500/10 text-emerald-500" : "bg-red-500/10 text-red-500"
+                      }`}
+                    >
+                      {key.isActive ? "Active" : "Revoked"}
+                    </Badge>
                   </div>
 
-                  {/* Right Column: Status & Meta */}
-                  <div className="flex-1 min-w-[150px]">
-                    <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-semibold mb-1.5">Status</p>
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <Badge 
-                        variant="outline" 
-                        className={`text-xs px-2 py-0.5 border-none font-medium ${
-                          key.isActive ? "bg-emerald-500/10 text-emerald-500" : "bg-red-500/10 text-red-500"
-                        }`}
-                      >
-                        {key.isActive ? "Active" : "Revoked"}
-                      </Badge>
-                    </div>
-                    <div className="text-[11px] text-zinc-600">
-                      <div>Created {format(new Date(key.createdAt), "MMM d, yyyy")}</div>
-                      {key.lastUsedAt ? (
-                        <div className="mt-0.5 text-zinc-500">Used {formatDistanceToNow(new Date(key.lastUsedAt), { addSuffix: true })}</div>
-                      ) : (
-                        <div className="mt-0.5">Never used</div>
-                      )}
-                    </div>
-                  </div>
-                  
                   {/* Actions */}
-                  <div className="flex md:flex-col items-center justify-end gap-2 shrink-0 md:pl-4 md:border-l border-zinc-800">
+                  <div className="flex items-center justify-end gap-1 shrink-0 sm:pl-3 sm:border-l border-zinc-800/60">
                     <Button 
                       variant="ghost" 
-                      size="sm" 
+                      size="icon" 
                       onClick={() => handleCopy(`mf_...${key.id.substring(0, 12)}`, key.id)}
-                      className="text-zinc-400 hover:text-white hover:bg-zinc-800 w-full justify-start md:justify-center h-8"
+                      className="text-zinc-500 hover:text-white hover:bg-zinc-800 w-8 h-8 rounded-lg transition-colors"
                       title="Copy Key ID"
                     >
-                      {copiedId === key.id ? <Check className="w-4 h-4 text-emerald-500 md:mr-0 mr-2" /> : <Copy className="w-4 h-4 md:mr-0 mr-2" />}
-                      <span className="md:hidden">Copy ID</span>
+                      {copiedId === key.id ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
                     </Button>
                     
                     {key.isActive && (
                       <Button 
                         variant="ghost" 
-                        size="sm" 
+                        size="icon" 
                         onClick={() => onRevoke(key.id)}
-                        className="text-amber-500/70 hover:text-amber-400 hover:bg-amber-400/10 w-full justify-start md:justify-center h-8"
+                        className="text-amber-600/70 hover:text-amber-400 hover:bg-amber-400/10 w-8 h-8 rounded-lg transition-colors"
                         title="Revoke Key"
                       >
-                        <Ban className="w-4 h-4 md:mr-0 mr-2" />
-                        <span className="md:hidden">Revoke</span>
+                        <Ban className="w-4 h-4" />
                       </Button>
                     )}
                     
                     <Button 
                       variant="ghost" 
-                      size="sm" 
+                      size="icon" 
                       onClick={() => onDelete(key.id)}
-                      className="text-red-500/70 hover:text-red-400 hover:bg-red-400/10 w-full justify-start md:justify-center h-8"
+                      className="text-red-500/50 hover:text-red-400 hover:bg-red-400/10 w-8 h-8 rounded-lg transition-colors"
                       title="Delete Key"
                     >
-                      <Trash2 className="w-4 h-4 md:mr-0 mr-2" />
-                      <span className="md:hidden">Delete</span>
+                      <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
-
                 </div>
               ))
             )}
@@ -355,7 +330,7 @@ export function ApiKeyCard({ keys, models, isLoading, onGenerate, onRevoke, onDe
 
       {/* Success Modal for New Key */}
       <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
-        <DialogContent className="bg-zinc-950 border-zinc-800 text-white max-w-md">
+        <DialogContent className="bg-zinc-950 border-zinc-800 text-white max-w-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-emerald-400">
               <Check className="w-5 h-5" />
@@ -371,22 +346,24 @@ export function ApiKeyCard({ keys, models, isLoading, onGenerate, onRevoke, onDe
               <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Secret Key</label>
               <div className="relative group">
                 <div className="absolute -inset-px bg-gradient-to-r from-emerald-500/20 to-blue-500/20 rounded-lg blur opacity-25" />
-                <div className="relative flex items-center gap-2 bg-zinc-900 border border-zinc-800 p-1.5 pl-4 rounded-lg overflow-hidden">
-                  <code className="flex-1 font-mono text-xs text-emerald-400 truncate py-2 select-all">
-                    {showRawKey ? generatedKey?.rawKey : "•".repeat(40)}
-                  </code>
-                  <div className="flex items-center gap-1 pr-1">
+                <div className="relative flex items-center gap-2 bg-zinc-900 border border-zinc-800 p-1.5 pl-4 rounded-lg overflow-hidden w-full">
+                  <div className="flex-1">
+                    <code className="block font-mono text-xs text-emerald-400 break-all py-2 select-all pr-2">
+                      {showRawKey ? generatedKey?.rawKey : "•".repeat(40)}
+                    </code>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-1">
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => setShowRawKey(!showRawKey)}
-                      className="h-9 w-9 text-zinc-500 hover:text-white hover:bg-zinc-800"
+                      className="h-9 w-9 text-zinc-500 hover:text-white hover:bg-zinc-800 shrink-0"
                     >
                       {showRawKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </Button>
                     <Button
                       onClick={() => handleCopy(generatedKey?.rawKey || "", "generated")}
-                      className="h-9 px-4 bg-zinc-800 hover:bg-zinc-700 text-xs font-medium gap-2 shadow-inner"
+                      className="h-9 px-4 bg-zinc-800 hover:bg-zinc-700 text-xs font-medium gap-2 shadow-inner shrink-0"
                     >
                       {copiedId === "generated" ? (
                         <>

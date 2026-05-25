@@ -45,7 +45,7 @@ public class ApiKeyService {
         String keyHash = hashKey(rawKey);
 
         Set<Model> models = new HashSet<>();
-        if (!isGlobal) {
+        if (!isGlobal && modelIds != null) {
             // fetch only the requested models that belong to this user
             models = modelIds.stream()
                     .map(id -> modelRepository.findById(id)
@@ -75,6 +75,7 @@ public class ApiKeyService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public List<ApiKeyResponse> getKeysForUser(String email) {
         return apiKeyRepository.findByOwnerEmailOrderByCreatedAtDesc(email)
                 .stream()
@@ -91,6 +92,7 @@ public class ApiKeyService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<ApiKeyResponse> getKeysForModel(UUID modelId) {
         return apiKeyRepository.findByModelIdOrderByCreatedAtDesc(modelId)
                 .stream()

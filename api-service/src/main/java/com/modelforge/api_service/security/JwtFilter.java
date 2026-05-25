@@ -74,7 +74,7 @@ public class JwtFilter extends OncePerRequestFilter {
                         key.getId(), LocalDateTime.now())).start();
 
                 if (authorized) {
-                    String principal = "apikey:" + key.getModel().getId().toString();
+                    String principal = "apikey:" + requestedModelId;
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                             principal, null,
                             List.of(new SimpleGrantedAuthority("ROLE_API")));
